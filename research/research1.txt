@@ -1,0 +1,8 @@
+PPM -> Portable PixMap
+PPM format 
+	P3 //means color is in ascii
+	col row
+	max_color_code(255 example)
+	255 0 0 -> 1 cell will be RGB triplets.
+
+Monochrome -> Image contain only single color/color values.
