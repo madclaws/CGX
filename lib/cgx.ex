@@ -1,18 +1,10 @@
 defmodule Cgx do
   @moduledoc """
   Documentation for Cgx.
-  """
+	"""
+	alias CGX.HelloWorld
+  def main() do
+		HelloWorld.generate_ppm()
+	end
 
-  @doc """
-  Hello world.
-
-  ## Examples
-
-      iex> Cgx.hello()
-      :world
-
-  """
-  def hello do
-    :world
-  end
 end
