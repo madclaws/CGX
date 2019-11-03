@@ -12,45 +12,79 @@ defmodule CGX.Vec3 do
   def make_unit_vector(vector) do
     vector_magnitude = calculate_magnitude(vector)
 
-    Map.put(vector, :x, vector.x / vector_magnitude)
-    |> Map.put(:y, vector.y / vector_magnitude)
-    |> Map.put(:z, vector.z / vector_magnitude)
+    CGX.Vec3.div(vector_magnitude, vector)
   end
 
   def squared_magnitude(vector) do
     :math.pow(vector.x, 2) + :math.pow(vector.y, 2) + :math.pow(vector.z, 2)
   end
 
-  def add(v1, v2) do
+  def add(%CGX.Vec3{x: x1, y: y1, z: z1}, %CGX.Vec3{x: x2, y: y2, z: z2}) do
     v3 = __struct__()
 
-    Map.put(v3, :x, v1.x + v2.x)
-    |> Map.put(:y, v1.y + v2.y)
-    |> Map.put(:z, v1.z + v2.z)
+    Map.put(v3, :x, x1 + x2)
+    |> Map.put(:y, y1 + y2)
+    |> Map.put(:z, z1 + z2)
   end
 
-  def sub(v1, v2) do
+  def add(constant, %CGX.Vec3{x: x1, y: y1, z: z1}) do
     v3 = __struct__()
 
-    Map.put(v3, :x, v1.x - v2.x)
-    |> Map.put(:y, v1.y - v2.y)
-    |> Map.put(:z, v1.z - v2.z)
+    Map.put(v3, :x, x1 + constant)
+    |> Map.put(:y, y1 + constant)
+    |> Map.put(:z, z1 + constant)
   end
 
-  def mul(v1, v2) do
+  def sub(%CGX.Vec3{x: x1, y: y1, z: z1}, %CGX.Vec3{x: x2, y: y2, z: z2}) do
     v3 = __struct__()
 
-    Map.put(v3, :x, v1.x * v2.x)
-    |> Map.put(:y, v1.y * v2.y)
-    |> Map.put(:z, v1.z * v2.z)
+    Map.put(v3, :x, x1 - x2)
+    |> Map.put(:y, y1 - y2)
+    |> Map.put(:z, z1 - z2)
   end
 
-  def div(v1, v2) do
+  def mul(%CGX.Vec3{x: x1, y: y1, z: z1}, %CGX.Vec3{x: x2, y: y2, z: z2}) do
     v3 = __struct__()
 
-    Map.put(v3, :x, v1.x * v2.x)
-    |> Map.put(:y, v1.y * v2.y)
-    |> Map.put(:z, v1.z * v2.z)
+    Map.put(v3, :x, x1 * x2)
+    |> Map.put(:y, y1 * y2)
+    |> Map.put(:z, z1 * z2)
+  end
+
+  def mul(constant, %CGX.Vec3{x: x1, y: y1, z: z1}) do
+    v3 = __struct__()
+
+    Map.put(v3, :x, x1 * constant)
+    |> Map.put(:y, y1 * constant)
+    |> Map.put(:z, z1 * constant)
+  end
+
+  def div(%CGX.Vec3{x: x1, y: y1, z: z1}, %CGX.Vec3{x: x2, y: y2, z: z2}) do
+    v3 = __struct__()
+
+    Map.put(v3, :x, x1 / x2)
+    |> Map.put(:y, y1 / y2)
+    |> Map.put(:z, z1 / z2)
+  end
+
+  def div(constant, %CGX.Vec3{x: x1, y: y1, z: z1}) do
+    v3 = __struct__()
+
+    Map.put(v3, :x, x1 / constant)
+    |> Map.put(:y, y1 / constant)
+    |> Map.put(:z, z1 / constant)
+  end
+
+  def dot(%CGX.Vec3{x: x1, y: y1, z: z1}, %CGX.Vec3{x: x2, y: y2, z: z2}) do
+    x1 * x2 + y1 * y2 + z1 * z2
+  end
+
+  def cross(%CGX.Vec3{x: x1, y: y1, z: z1}, %CGX.Vec3{x: x2, y: y2, z: z2}) do
+    v3 = __struct__()
+
+    Map.put(v3, :x, y1 * z2 - z1 * y2)
+    |> Map.put(:y, z1 * x2 - x1 * z2)
+    |> Map.put(:z, x1 * y2 - y1 * x2)
   end
 
   defp calculate_magnitude(vector) do

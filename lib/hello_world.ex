@@ -2,6 +2,7 @@ defmodule CGX.HelloWorld do
   @moduledoc """
     HelloWorld module just generates a normal simple 200 * 100 PPM file
   """
+  alias CGX.Vec3
 
   def generate_ppm() do
     total_column = 200
@@ -21,12 +22,12 @@ defmodule CGX.HelloWorld do
         {_inc, ppm_str} =
           Enum.reduce(0..(total_column - 1), {0, ppm_str}, fn _current_col,
                                                               {incremented_col, ppm_str} ->
-            float_red = incremented_col / total_column
-            float_green = decremented_row / total_row
-            float_blue = 0.2
-            int_red = floor(float_red * 255.9)
-            int_green = floor(float_green * 255.9)
-            int_blue = floor(float_blue * 255.9)
+            rgb_vec =
+              Vec3.create(incremented_col / total_column, decremented_row / total_row, 0.2)
+
+            int_red = floor(rgb_vec.x * 255.9)
+            int_green = floor(rgb_vec.y * 255.9)
+            int_blue = floor(rgb_vec.z * 255.9)
             {incremented_col + 1, ppm_str <> "#{int_red} #{int_green} #{int_blue}\n"}
           end)
 
