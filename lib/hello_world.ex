@@ -3,7 +3,7 @@ defmodule CGX.HelloWorld do
     HelloWorld module just generates a normal simple 200 * 100 PPM file
   """
   alias CGX.Vec3
-
+	alias CGX.Ray
   def generate_ppm() do
     total_column = 200
     total_row = 100
@@ -13,7 +13,11 @@ defmodule CGX.HelloWorld do
   end
 
   defp generate_ppm_string(total_column, total_row) do
-    ppm_header_string = "P3\n#{total_column} #{total_row}\n255\n"
+		lower_left_corner	=	Vec3.create(-2.0, -1.0, -1.0)
+		horizontal_offset = Vec3.create(4.0, 0.0, 0.0)
+		vertical_offset	=	Vec3.create(0.0, 2.0, 0.0)
+		origin	=	Vec3.create(0, 0, 0)
+		ppm_header_string = "P3\n#{total_column} #{total_row}\n255\n"
 
     {_dec, ppm_string} =
       Enum.reduce((total_row - 1)..0, {total_row - 1, ppm_header_string}, fn _current_row,
@@ -22,12 +26,15 @@ defmodule CGX.HelloWorld do
         {_inc, ppm_str} =
           Enum.reduce(0..(total_column - 1), {0, ppm_str}, fn _current_col,
                                                               {incremented_col, ppm_str} ->
-            rgb_vec =
-              Vec3.create(incremented_col / total_column, decremented_row / total_row, 0.2)
-
-            int_red = floor(rgb_vec.x * 255.9)
-            int_green = floor(rgb_vec.y * 255.9)
-            int_blue = floor(rgb_vec.z * 255.9)
+						u =	incremented_col / total_column
+						v	=	decremented_row / total_row
+						direction_offset =  Vec3.mul(u, horizontal_offset)
+						|>	Vec3.add(Vec3.mul(v, vertical_offset))
+						ray = Ray.create(origin, Vec3.add(lower_left_corner, direction_offset))
+						col = color(ray)
+						int_red = floor(col.x * 255.9)
+            int_green = floor(col.y * 255.9)
+            int_blue = floor(col.z * 255.9)
             {incremented_col + 1, ppm_str <> "#{int_red} #{int_green} #{int_blue}\n"}
           end)
 
@@ -38,6 +45,14 @@ defmodule CGX.HelloWorld do
   end
 
   defp write_ppm_string_to_file(ppm_string) do
-    File.write!("hello.ppm", ppm_string)
-  end
+    File.write!("chapter4.ppm", ppm_string)
+	end
+
+	defp color(%Ray{origin: _origin, direction: direction}) do
+		unit_direction	=	Vec3.make_unit_vector(direction)
+		t	=	0.5 * (unit_direction.y + 1.0)
+		a	=	Vec3.mul((1 -	t), Vec3.create(1, 1, 1))
+		b	=	Vec3.mul(t, Vec3.create(0.5, 0.7, 1.0))
+		Vec3.add(a, b)
+	end
 end
