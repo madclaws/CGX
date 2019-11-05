@@ -16,7 +16,8 @@ defmodule CGX.HelloWorld do
 		lower_left_corner	=	Vec3.create(-2.0, -1.0, -1.0)
 		horizontal_offset = Vec3.create(4.0, 0.0, 0.0)
 		vertical_offset	=	Vec3.create(0.0, 2.0, 0.0)
-		origin	=	Vec3.create(0, 0, 0)
+    origin	=	Vec3.create(0, 0, 0)
+    sphere_origin = Vec3.create(0, 0, 1)
 		ppm_header_string = "P3\n#{total_column} #{total_row}\n255\n"
 
     {_dec, ppm_string} =
@@ -31,7 +32,7 @@ defmodule CGX.HelloWorld do
 						direction_offset =  Vec3.mul(u, horizontal_offset)
 						|>	Vec3.add(Vec3.mul(v, vertical_offset))
 						ray = Ray.create(origin, Vec3.add(lower_left_corner, direction_offset))
-						col = color(ray)
+						col = color(ray, is_sphere_hit(sphere_origin, 0.5, ray))
 						int_red = floor(col.x * 255.9)
             int_green = floor(col.y * 255.9)
             int_blue = floor(col.z * 255.9)
@@ -45,14 +46,27 @@ defmodule CGX.HelloWorld do
   end
 
   defp write_ppm_string_to_file(ppm_string) do
-    File.write!("chapter4.ppm", ppm_string)
+    File.write!("chapter5.ppm", ppm_string)
 	end
 
-	defp color(%Ray{origin: _origin, direction: direction}) do
+  defp color(_ray, _is_sphere_hit)
+	defp color(%Ray{origin: _origin, direction: direction}, false) do
 		unit_direction	=	Vec3.make_unit_vector(direction)
 		t	=	0.5 * (unit_direction.y + 1.0)
 		a	=	Vec3.mul((1 -	t), Vec3.create(1, 1, 1))
 		b	=	Vec3.mul(t, Vec3.create(0.5, 0.7, 1.0))
 		Vec3.add(a, b)
-	end
+  end
+
+  defp color(_, _) do
+    Vec3.create(1, 0, 0)
+  end
+
+  defp is_sphere_hit(sphere_origin, radius, %Ray{origin: origin, direction: direction}) do
+    vec_ac = Vec3.sub(origin, sphere_origin)
+    a = Vec3.dot(direction, direction)
+    b = 2 * Vec3.dot(direction, vec_ac)
+    c = Vec3.dot(vec_ac, vec_ac) - :math.pow(radius, 2)
+    ((b * b) - 4 * a * c) > 0
+  end
 end
