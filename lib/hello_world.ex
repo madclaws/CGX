@@ -46,27 +46,36 @@ defmodule CGX.HelloWorld do
   end
 
   defp write_ppm_string_to_file(ppm_string) do
-    File.write!("chapter5.ppm", ppm_string)
+    File.write!("chapter6.ppm", ppm_string)
 	end
 
   defp color(_ray, _is_sphere_hit)
-	defp color(%Ray{origin: _origin, direction: direction}, false) do
-		unit_direction	=	Vec3.make_unit_vector(direction)
-		t	=	0.5 * (unit_direction.y + 1.0)
+
+  defp color(%Ray{origin: _origin, direction: _direction} = ray, t) when t > 0 do
+
+    vec_normal = Vec3.sub(Ray.get_point_at_parameter(ray, t), Vec3.create(0, 0, -1))
+                 |> Vec3.make_unit_vector()
+    Vec3.mul(0.5, Vec3.create(vec_normal.x + 1, vec_normal.y + 1, vec_normal.z + 1))
+  end
+
+  defp color(%Ray{origin: _origin, direction: _direction}, t) do
+		# unit_direction	=	Vec3.make_unit_vector(direction)
+		# t	=	0.5 * (unit_direction.y + 1.0)
 		a	=	Vec3.mul((1 -	t), Vec3.create(1, 1, 1))
 		b	=	Vec3.mul(t, Vec3.create(0.5, 0.7, 1.0))
 		Vec3.add(a, b)
   end
 
-  defp color(_, _) do
-    Vec3.create(1, 0, 0)
-  end
 
   defp is_sphere_hit(sphere_origin, radius, %Ray{origin: origin, direction: direction}) do
     vec_ac = Vec3.sub(origin, sphere_origin)
     a = Vec3.dot(direction, direction)
     b = 2 * Vec3.dot(direction, vec_ac)
     c = Vec3.dot(vec_ac, vec_ac) - :math.pow(radius, 2)
-    ((b * b) - 4 * a * c) > 0
+    ((b * b) - 4 * a * c) |> get_solution_t(b, a)
+
   end
+
+  defp get_solution_t(discriminant, _b, _a) when discriminant < 0, do: -1.0
+  defp get_solution_t(discriminant, b, a), do: (-b - :math.sqrt(discriminant)) / (2 * a)
 end
