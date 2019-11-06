@@ -4,7 +4,9 @@ defmodule CGX.HelloWorld do
   """
   alias CGX.Vec3
   alias CGX.Ray
-
+  alias CGX.Hittable
+  require Logger
+  @max_float 1.7976931348623157e+308
   def generate_ppm() do
     total_column = 200
     total_row = 100
@@ -18,7 +20,8 @@ defmodule CGX.HelloWorld do
     horizontal_offset = Vec3.create(4.0, 0.0, 0.0)
     vertical_offset = Vec3.create(0.0, 2.0, 0.0)
     origin = Vec3.create(0, 0, 0)
-    sphere_origin = Vec3.create(0, 0, 1)
+    sphere_origin = Vec3.create(0, 0, -1)
+    t_sphere = Hittable.create(:sphere, {sphere_origin, 0.5})
     ppm_header_string = "P3\n#{total_column} #{total_row}\n255\n"
 
     {_dec, ppm_string} =
@@ -36,7 +39,8 @@ defmodule CGX.HelloWorld do
               |> Vec3.add(Vec3.mul(v, vertical_offset))
 
             ray = Ray.create(origin, Vec3.add(lower_left_corner, direction_offset))
-            col = color(ray, is_sphere_hit(sphere_origin, 0.5, ray))
+            # col = color(ray, is_sphere_hit(sphere_origin, 0.5, ray))
+            col = color(ray, t_sphere)
             int_red = floor(col.x * 255.9)
             int_green = floor(col.y * 255.9)
             int_blue = floor(col.z * 255.9)
@@ -50,28 +54,28 @@ defmodule CGX.HelloWorld do
   end
 
   defp write_ppm_string_to_file(ppm_string) do
-    File.write!("chapter6.ppm", ppm_string)
+    File.write!("chapter7.ppm", ppm_string)
   end
 
   defp color(_ray, _is_sphere_hit)
 
-  defp color(%Ray{origin: _origin, direction: _direction} = ray, t) when t > 0 do
-    vec_normal =
-      Vec3.sub(Ray.get_point_at_parameter(ray, t), Vec3.create(0, 0, -1))
-      |> Vec3.make_unit_vector()
+  defp color(%Ray{origin: _origin, direction: direction} = ray, hittable) do
+    {is_hit, hit_record} = Hittable.hit(hittable, %{ray: ray, t_max: @max_float, t_min: 0.0})
 
-    Vec3.mul(0.5, Vec3.create(vec_normal.x + 1, vec_normal.y + 1, vec_normal.z + 1))
+    case is_hit do
+      true ->
+
+        Vec3.mul(
+          0.5,
+          Vec3.create(hit_record.normal.x + 1, hit_record.normal.y + 1, hit_record.normal.z + 1)
+        )
+
+      false ->
+        unit_direction = Vec3.make_unit_vector(direction)
+        t = 0.5 * (unit_direction.y + 1.0)
+        a = Vec3.mul(1 - t, Vec3.create(1, 1, 1))
+        b = Vec3.mul(t, Vec3.create(0.5, 0.7, 1.0))
+        Vec3.add(a, b)
+    end
   end
-
-  defp color(%Ray{origin: _origin, direction: _direction}, t) do
-    # unit_direction	=	Vec3.make_unit_vector(direction)
-    # t	=	0.5 * (unit_direction.y + 1.0)
-    a = Vec3.mul(1 - t, Vec3.create(1, 1, 1))
-    b = Vec3.mul(t, Vec3.create(0.5, 0.7, 1.0))
-    Vec3.add(a, b)
-  end
-
-
-  # defp get_solution_t(discriminant, _b, _a) when discriminant < 0, do: -1.0
-  # defp get_solution_t(discriminant, b, a), do: (-b - :math.sqrt(discriminant)) / (2 * a)
 end
