@@ -6,3 +6,17 @@ PPM format
 	255 0 0 -> 1 cell will be RGB triplets.
 
 Monochrome -> Image contain only single color/color values.
+
+Mulitple Objects in a functional way.
+We have a hittable module, where we can create different types of 
+hittable Objects.
+Say we created 2 hittable objects and pushed to a hittable_list.
+Then we can loop through each and call
+Hittable.hit(hittable)
+Hittable.hit_on_list(hittable_list)
+	|> return {is_hit, hit_record}
+hit_record = %{}
+
+|> Write hit function, now for sphere only
+|> Then write for hit_on_list
+
