@@ -22,6 +22,9 @@ defmodule CGX.HelloWorld do
     origin = Vec3.create(0, 0, 0)
     sphere_origin = Vec3.create(0, 0, -1)
     t_sphere = Hittable.create(:sphere, {sphere_origin, 0.5})
+    t_sphere2 = Hittable.create(:sphere, {Vec3.create(0, -100.5, -1), 100})
+    hittable_objects = [t_sphere2 | [t_sphere]]
+    # Logger.info(inspect hittable_objects)
     ppm_header_string = "P3\n#{total_column} #{total_row}\n255\n"
 
     {_dec, ppm_string} =
@@ -39,8 +42,7 @@ defmodule CGX.HelloWorld do
               |> Vec3.add(Vec3.mul(v, vertical_offset))
 
             ray = Ray.create(origin, Vec3.add(lower_left_corner, direction_offset))
-            # col = color(ray, is_sphere_hit(sphere_origin, 0.5, ray))
-            col = color(ray, t_sphere)
+            col = color(ray, hittable_objects)
             int_red = floor(col.x * 255.9)
             int_green = floor(col.y * 255.9)
             int_blue = floor(col.z * 255.9)
@@ -59,8 +61,9 @@ defmodule CGX.HelloWorld do
 
   defp color(_ray, _is_sphere_hit)
 
-  defp color(%Ray{origin: _origin, direction: direction} = ray, hittable) do
-    {is_hit, hit_record} = Hittable.hit(hittable, %{ray: ray, t_max: @max_float, t_min: 0.0})
+  defp color(%Ray{origin: _origin, direction: direction} = ray, hittable_objects) do
+    {is_hit, hit_record, _closest_t} = Hittable.hit_on_list(hittable_objects,
+    %{ray: ray, t_max: @max_float, t_min: 0.0})
 
     case is_hit do
       true ->

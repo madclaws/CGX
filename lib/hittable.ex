@@ -4,6 +4,7 @@ defmodule CGX.Hittable do
   """
   alias CGX.Ray
   alias CGX.Vec3
+  require Logger
   defstruct object: nil, info: nil
 
   @spec create(any, any) :: CGX.Hittable.t()
@@ -23,6 +24,18 @@ defmodule CGX.Hittable do
     {origin, radius} = hittable.info
     {discriminant, b, a} = get_determinant(origin, radius, ray)
     get_hit_record(discriminant, b, a, t_max, t_min, ray, hittable.info)
+  end
+
+  def hit_on_list(hittable_list, %{ray: _ray, t_min: _t_min, t_max: t_max} = hit_info)  do
+    tmp_record = %{time: nil, point_of_intersection: nil, normal: nil}
+    Enum.reduce(hittable_list, {false, tmp_record, t_max}, fn hittable, hit_info_return ->
+      case CGX.Hittable.hit(hittable, hit_info) do
+        {true, hit_rec} ->
+          {true, hit_rec, hit_rec.time}
+        {false, _} ->
+          hit_info_return
+      end
+    end)
   end
 
   defp get_determinant(sphere_origin, radius, %Ray{origin: origin, direction: direction}) do

@@ -20,3 +20,17 @@ hit_record = %{}
 |> Write hit function, now for sphere only
 |> Then write for hit_on_list
 
+{is_hit, hit_record} -> currently only from one.
+But now we iterate through the list and update the it. 
+
+we have an accumulator map,
+{is_hit, hit_record, closest_so_far}
+
+tmp_record = %{time: nil, point_of_intersection: nil, normal: nil}
+Enum.reduce(hittable_list, {false, tmp_record, t_max}, fn hittable, {is_hit, record, closest} ->
+	case hit(hittable, ray) do
+		{true, rec} -> 
+		{false, _}
+	end
+)
+

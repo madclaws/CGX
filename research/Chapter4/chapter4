@@ -1,8 +1,0 @@
-Rays, A Simple Camera and A Background.
-
-p(t) = A + (t * B)
-A = Origin of Ray
-B = Direction.
-t = Parameter
-p(t)	=	Point of Parameter.
-
