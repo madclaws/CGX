@@ -8,10 +8,10 @@ defmodule CGX.HelloWorld do
   alias CGX.Camera
   require Logger
   @max_float 1.7976931348623157e+308
+  @total_samples 100
   def generate_ppm() do
     total_column = 200
     total_row = 100
-
     generate_ppm_string(total_column, total_row)
     |> write_ppm_string_to_file()
   end
@@ -31,11 +31,19 @@ defmodule CGX.HelloWorld do
         {_inc, ppm_str} =
           Enum.reduce(0..(total_column - 1), {0, ppm_str}, fn _current_col,
                                                               {incremented_col, ppm_str} ->
-            u = incremented_col / total_column
-            v = decremented_row / total_row
+            col = Enum.reduce(0..(@total_samples - 1), Vec3.create(0, 0, 0), fn _sample_index, color_vec ->
+              u = (incremented_col + :rand.uniform()) / total_column
+              v = (decremented_row + :rand.uniform()) / total_row
 
-            ray = Camera.get_ray(u, v)
-            col = color(ray, hittable_objects)
+              ray = Camera.get_ray(u, v)
+              Vec3.add(color_vec, color(ray, hittable_objects))
+            end)
+            col  = Vec3.div(@total_samples, col)
+            # u = (incremented_col + 0) / total_column
+            # v = (decremented_row + 0) / total_row
+            # ray = Camera.get_ray(u, v)
+            # col = color(ray, hittable_objects)
+            # Logger.info(inspect col)
             int_red = floor(col.x * 255.9)
             int_green = floor(col.y * 255.9)
             int_blue = floor(col.z * 255.9)
