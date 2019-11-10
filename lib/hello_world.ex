@@ -5,6 +5,7 @@ defmodule CGX.HelloWorld do
   alias CGX.Vec3
   alias CGX.Ray
   alias CGX.Hittable
+  alias CGX.Camera
   require Logger
   @max_float 1.7976931348623157e+308
   def generate_ppm() do
@@ -16,10 +17,6 @@ defmodule CGX.HelloWorld do
   end
 
   defp generate_ppm_string(total_column, total_row) do
-    lower_left_corner = Vec3.create(-2.0, -1.0, -1.0)
-    horizontal_offset = Vec3.create(4.0, 0.0, 0.0)
-    vertical_offset = Vec3.create(0.0, 2.0, 0.0)
-    origin = Vec3.create(0, 0, 0)
     sphere_origin = Vec3.create(0, 0, -1)
     t_sphere = Hittable.create(:sphere, {sphere_origin, 0.5})
     t_sphere2 = Hittable.create(:sphere, {Vec3.create(0, -100.5, -1), 100})
@@ -37,11 +34,7 @@ defmodule CGX.HelloWorld do
             u = incremented_col / total_column
             v = decremented_row / total_row
 
-            direction_offset =
-              Vec3.mul(u, horizontal_offset)
-              |> Vec3.add(Vec3.mul(v, vertical_offset))
-
-            ray = Ray.create(origin, Vec3.add(lower_left_corner, direction_offset))
+            ray = Camera.get_ray(u, v)
             col = color(ray, hittable_objects)
             int_red = floor(col.x * 255.9)
             int_green = floor(col.y * 255.9)
