@@ -39,11 +39,6 @@ defmodule CGX.HelloWorld do
               Vec3.add(color_vec, color(ray, hittable_objects))
             end)
             col  = Vec3.div(@total_samples, col)
-            # u = (incremented_col + 0) / total_column
-            # v = (decremented_row + 0) / total_row
-            # ray = Camera.get_ray(u, v)
-            # col = color(ray, hittable_objects)
-            # Logger.info(inspect col)
             int_red = floor(col.x * 255.9)
             int_green = floor(col.y * 255.9)
             int_blue = floor(col.z * 255.9)
@@ -68,11 +63,13 @@ defmodule CGX.HelloWorld do
 
     case is_hit do
       true ->
+        target_vector = Vec3.add(hit_record.point_of_intersection, hit_record.normal)
+        |> Vec3.add(random_in_unit_sphere(true, Vec3.create(0, 0, 0)))
 
-        Vec3.mul(
-          0.5,
-          Vec3.create(hit_record.normal.x + 1, hit_record.normal.y + 1, hit_record.normal.z + 1)
-        )
+        # Vec3.mul(
+        #   0.5,
+        #   Vec3.create(color(Ray.create(hit_record.point_of_intersection, Vec3.sub(target_vector, hit_record.point_of_intersection)), hittable_objects))
+        # )
 
       false ->
         unit_direction = Vec3.make_unit_vector(direction)
@@ -81,5 +78,20 @@ defmodule CGX.HelloWorld do
         b = Vec3.mul(t, Vec3.create(0.5, 0.7, 1.0))
         Vec3.add(a, b)
     end
+  end
+
+  def random_in_unit_sphere(true, _p_vec) do
+    rand_vec = calculate_random_vector_in_sphere()
+    random_in_unit_sphere(Vec3.squared_magnitude(rand_vec) >= 1, rand_vec)
+  end
+
+  def random_in_unit_sphere(false, p_vec) do
+    p_vec
+  end
+
+  defp calculate_random_vector_in_sphere() do
+    p_vec = Vec3.create(:rand.uniform(), :rand.uniform(), :rand.uniform())
+    Vec3.mul(2, p_vec)
+    |> Vec3.sub(Vec3.create(1, 1, 1))
   end
 end
