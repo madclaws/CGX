@@ -39,6 +39,7 @@ defmodule CGX.HelloWorld do
               Vec3.add(color_vec, color(ray, hittable_objects))
             end)
             col  = Vec3.div(@total_samples, col)
+            col = Vec3.create(:math.sqrt(col.x), :math.sqrt(col.y), :math.sqrt(col.z))
             int_red = floor(col.x * 255.9)
             int_green = floor(col.y * 255.9)
             int_blue = floor(col.z * 255.9)
@@ -66,10 +67,8 @@ defmodule CGX.HelloWorld do
         target_vector = Vec3.add(hit_record.point_of_intersection, hit_record.normal)
         |> Vec3.add(random_in_unit_sphere(true, Vec3.create(0, 0, 0)))
 
-        # Vec3.mul(
-        #   0.5,
-        #   Vec3.create(color(Ray.create(hit_record.point_of_intersection, Vec3.sub(target_vector, hit_record.point_of_intersection)), hittable_objects))
-        # )
+        ray_to_unit_sphere = Ray.create(hit_record.point_of_intersection, Vec3.sub(target_vector, hit_record.point_of_intersection))
+        Vec3.mul(0.5, color(ray_to_unit_sphere, hittable_objects))
 
       false ->
         unit_direction = Vec3.make_unit_vector(direction)
