@@ -16,7 +16,7 @@ defmodule CGX.Hittable do
   end
 
   @spec hit(CGX.Hittable.t(), %{ray: CGX.Ray.t(), t_max: any, t_min: any}) ::
-          {false, nil} | {true, %{normal: nil, point_of_intersection: nil, time: nil}}
+          {false, nil} | {true, %{normal: nil, point_of_intersection: nil, time: nil, material: :lambert}}
   def hit(
         %CGX.Hittable{object: :sphere} = hittable,
         %{ray: ray, t_min: t_min, t_max: t_max} = _hit_info
@@ -27,7 +27,7 @@ defmodule CGX.Hittable do
   end
 
   def hit_on_list(hittable_list, %{ray: _ray, t_min: _t_min, t_max: t_max} = hit_info)  do
-    tmp_record = %{time: nil, point_of_intersection: nil, normal: nil}
+    tmp_record = %{time: nil, point_of_intersection: nil, normal: nil, material: :lambert}
     Enum.reduce(hittable_list, {false, tmp_record, t_max}, fn hittable, hit_info_return ->
       case CGX.Hittable.hit(hittable, hit_info) do
         {true, hit_rec} ->

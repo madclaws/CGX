@@ -60,7 +60,7 @@ defmodule CGX.HelloWorld do
 
   defp color(%Ray{origin: _origin, direction: direction} = ray, hittable_objects) do
     {is_hit, hit_record, _closest_t} = Hittable.hit_on_list(hittable_objects,
-    %{ray: ray, t_max: @max_float, t_min: 0.0})
+    %{ray: ray, t_max: @max_float, t_min: 0.001})
 
     case is_hit do
       true ->
